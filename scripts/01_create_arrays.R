@@ -5,7 +5,7 @@
 library(tidyverse)
 library(raster)
 library(keras)
-
+setwd("~/Desktop/Bioinformatics/FF_deep_learning")
 #subject metadata
 subjects <- readRDS("../data/subjects.RDS")
 #classifications
@@ -21,7 +21,8 @@ falk_with_meta <- falk_with_meta %>%
   mutate(fraction_yes = yes/total_responses) %>%
   dplyr::select(subject_id, yes, no, fraction_yes, total_responses, everything()) %>%
   #some classifications have thousands of responses, drop them
-  filter(yes <=20)
+  filter(yes <=20) %>%
+  drop_na()
 
 #make labels
 falk_labels <- falk_with_meta %>%
@@ -40,8 +41,10 @@ array_from_subject <- function(subject){
                " +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
   filename <- basename(subj_url)
   
-  download.file(subj_url, filename, mode = 'wb')
-  
+  #download.file(subj_url, filename, mode = 'wb')
+  download.file(subj_url, filename, method = "curl", extra = "--retry 10 --retry-delay 10")
+  #give the server a break
+  Sys.sleep(3)
   img <- raster::brick(filename,              
                        crs=crs)
   
@@ -54,7 +57,7 @@ array_from_subject <- function(subject){
   
   
   return(ff_array)
-
+  
 }
 
 #function that takes a bunch of subjects and creates array_unlisted from those subjects
@@ -90,9 +93,9 @@ dim(array_test)
 bad_subjects <- falk_with_meta %>%
   filter(`#width` != 350 |
            `#height` != 350 |
-            is.na(`#width`) |
+           is.na(`#width`) |
            is.na(`#height`)            
-         ) 
+  ) 
 
 ##652 out of 10K
 #30 are the wrong size (all too small)
@@ -115,10 +118,10 @@ clean_subjects <- falk_with_meta %>%
            !is.na(`#height`)) 
 
 #generate training/testing data/labels
-ff_train <- generate_input_tensors(clean_subjects$subject_id[1:10])
-ff_test <- generate_input_tensors(clean_subjects$subject_id[11:20])
-ff_train_labels <- falk_labels[1:10,]
-ff_test_labels <- falk_labels[11:20,]
+ff_train <- generate_input_tensors(clean_subjects$subject_id[1:5731])
+ff_test <- generate_input_tensors(clean_subjects$subject_id[5732:9551])
+ff_train_labels <- falk_labels[1:5731,]
+ff_test_labels <- falk_labels[5732:9551,]
 
 #save as a list for easy loading
 saveRDS(list(ff_train = ff_train, 
