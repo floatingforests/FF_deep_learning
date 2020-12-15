@@ -13,7 +13,8 @@ falk <- readRDS("../data/falk.RDS")
 
 #join classification data to subject metadata
 falk_with_meta <- falk %>%
-  left_join(subjects)
+  left_join(subjects) %>%
+  drop_na()
 
 #encode responses as fraction of yes/total responses
 falk_with_meta <- falk_with_meta %>%
