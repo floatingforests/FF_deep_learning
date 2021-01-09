@@ -47,7 +47,7 @@ img_from_subject <- function(subj_url){
 img_from_subject_ln <- function(subj_url){
   
   filename <- basename(subj_url)
-  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{basename} ./{basename}"))
+  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{filename} ./{filename}"))
   
   return(filename)
   
