@@ -4,6 +4,7 @@ library(tidyverse)
 # Set Working Directory for My Sanity
 working_dir <- here::here()
 script_dir <- paste0(working_dir, "/scripts/kellymod/")
+setwd(working_dir)
 
 #load constants
 source(paste0(script_dir, "00_constants.R"))
