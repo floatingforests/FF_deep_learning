@@ -129,4 +129,6 @@ dir.create(dat_path)
 # Subset and Download Images
 make_dir_flow(label_data = falk_with_meta, label_col = 'is_kelp',
               categories=unique(falk_with_meta$is_kelp),
-              num_images = 100, sample_per = c(0.7,0.2,0.1), dataset_dir = dat_path)
+              #num_images = 100, #testing
+              num_images = nrow(falk_with_meta), #the whole shebang
+              sample_per = c(0.7,0.2,0.1), dataset_dir = dat_path)
