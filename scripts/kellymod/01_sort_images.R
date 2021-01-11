@@ -86,11 +86,19 @@ remove_files_dirs <- function(directory) {
 }
 
 # Split and Save PNGS to Separate Folders
-split_data_to_set_dirs <- function(data, label_name="kelp_yes", dataset_dir, trainEnd, testEnd, valStart, num_images) {
+split_data_to_set_dirs <- function(data, label_name="kelp_yes", 
+                                   dataset_dir, 
+                                   #trainEnd, testEnd, valStart, 
+                                   train_idx, test_idx, val_idx,
+                                   num_images) {
   
-  train <- data[1:trainEnd,]
-  test <- data[(trainEnd + 1):testEnd,]
-  val <- data[valStart:num_images,]
+  # train <- data[1:trainEnd,]
+  # test <- data[(trainEnd + 1):testEnd,]
+  # val <- data[valStart:num_images,]
+  # 
+  train <- data[train_idx,]
+  test <- data[test_idx,]
+  val <- data[val_idx,]
   
   make_labels_subdir(dataset_dir, label_name)
   
@@ -104,6 +112,23 @@ split_data_to_set_dirs <- function(data, label_name="kelp_yes", dataset_dir, tra
   map(val$locations, img_from_subject_ln)
 }
 
+
+# Get indices for train, test, and validation data 
+# set given a percentage split of the data
+get_ttv_indicies <- function(vec,  sample_per = c(0.7,0.2,0.1)){
+  if(sum(sample_per) != 1) stop("Sampling split between trian, test, and validation\n
+                                does not sum to 1")
+  
+  train_samp <- sample(vec, size = round(sample_per[1]*length(vec)))
+  
+  test_samp <-  sample(vec[!(vec %in% train_samp)], size = round(sample_per[2]*length(vec)))
+  
+  val_samp <- vec[!(vec %in% c(train_samp, test_samp))]
+  
+  return(list(train = train_samp, test = test_samp, val = val_samp))
+}
+
+
 # Write Images to Directories Split by Binary Labels
 make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample_per, categories) {
   
@@ -111,14 +136,29 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   make_dirs(dataset_dir)
   
   # Figure Out Start Stop Indices
-  testEnd <- floor(num_images*sample_per[1])
-  trainEnd <- floor(num_images*sample_per[2])
-  valStart <- num_images - trainEnd
+  # testEnd <- floor(num_images*sample_per[1])
+  # trainEnd <- floor(num_images*sample_per[2])
+  # valStart <- num_images - trainEnd
+  
+  #Figure out test, train, and validation indices
+  #Stratify by yes/no and instrument - later stratify by source in next version
+  idx_list <- pmap(crossing(unique(label_data$spacecraft),
+                            unique(label_data$is_kelp)) %>% as.list(),
+                  ~ which(label_data$spacecraft==.x & label_data$is_kelp==.y))
+  
+  train_test_val <- map(idx_list, get_ttv_indicies, sample_per = sample_per)
+  
+  train_idx <- map(train_test_val, ~.x$train) %>% flatten()
+  test_idx <- map(train_test_val, ~.x$test) %>% flatten()
+  val_idx <- map(train_test_val, ~.x$val) %>% flatten()
   
   # Find, Save PNGS to Separate Directories
   for (category in categories) {
     data <- label_data[sample(which(label_data[,label_col] == category), num_images), ]
-    split_data_to_set_dirs(data=data, label_name=category, dataset_dir=dataset_dir, testEnd=testEnd, trainEnd=testEnd, valStart=valStart, num_images = num_images)
+    split_data_to_set_dirs(data=data, label_name=category, dataset_dir=dataset_dir, 
+                           #testEnd=testEnd, trainEnd=testEnd, valStart=valStart, 
+                           train_idx = train_idx, test_idx = test_idx, val_idx = val_idx,
+                           num_images = num_images)
   }
   
 }
@@ -126,7 +166,9 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
 # Set up Project Parent Data Directory
 dir.create(dat_path)
 
+
 # Subset and Download Images
+set.seed(2020)
 make_dir_flow(label_data = falk_with_meta, label_col = 'is_kelp',
               categories=unique(falk_with_meta$is_kelp),
               #num_images = 100, #testing
