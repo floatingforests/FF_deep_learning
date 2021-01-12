@@ -52,8 +52,7 @@ img_from_subject <- function(subj_url){
 img_from_subject_ln <- function(subj_url, category, dataset_dir, train_test){
   
   filename <- basename(subj_url)
-  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{filename} 
-                    {dataset_dir}/{train_test}/{category}/{filename}"))
+  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{filename} {dataset_dir}/{train_test}/{category}/{filename}"))
   
   return(filename)
   
@@ -62,7 +61,7 @@ img_from_subject_ln <- function(subj_url, category, dataset_dir, train_test){
 
 # Take a slice of the data labeled for training, testing, or validation,
 # and map over it to put images in the right place
-img_from_traintest <- function(train_test_dat, dat_type, dataset_dir){
+img_from_traintest <- function(train_test_dat, dat_type, dataset_dir, label_col){
   map2(train_test_dat$locations, train_test_dat[[label_col]],
        img_from_subject_ln, #the function!
        dataset_dir = dataset_dir, train_test = dat_type
@@ -102,7 +101,6 @@ remove_files_dirs <- function(directory) {
   invisible(file.remove(f))
 }
 
-# Split and Save PNGS to Separate Folders
 
 # Split and Save PNGS to Separate Folders
 split_data_to_set_dirs <- function(label_data, 
@@ -120,16 +118,8 @@ split_data_to_set_dirs <- function(label_data,
               validation = label_data[val_idx,])
   
   #walk over each dataset and get images from it
-  iwalk(dat, img_from_traintest, dataset_dir = dataset_dir)
-# 
-#   setwd(file.path(dataset_dir,'train',label_name))
-#   map(train$locations, img_from_subject_ln)
-#   
-#   setwd(file.path(dataset_dir,'test',label_name))
-#   map(test$locations, img_from_subject_ln)
-#   
-#   setwd(file.path(dataset_dir,'validation',label_name))
-#   map(val$locations, img_from_subject_ln)
+  iwalk(dat, img_from_traintest, dataset_dir = dataset_dir, label_col = label_col)
+
 }
 
 
