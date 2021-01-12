@@ -66,15 +66,16 @@ make_dirs <- function(dataset_dir){
 
 # Make Labels Subdirectories
 make_labels_subdir <- function(dataset_dir, label_name) {
-  
-  setwd(file.path(dataset_dir, 'test'))
-  dir.create(label_name)
-  
-  setwd(file.path(dataset_dir, 'train'))
-  dir.create(label_name) 
-  
-  setwd(file.path(dataset_dir, 'validation'))
-  dir.create(label_name) 
+  walk(c("test", "train", "validation"),
+       ~dir.create(file.path(dataset_dir, .x, label_name)))
+  # setwd(file.path(dataset_dir, 'test'))
+  # dir.create(label_name)
+  # 
+  # setwd(file.path(dataset_dir, 'train'))
+  # dir.create(label_name) 
+  # 
+  # setwd(file.path(dataset_dir, 'validation'))
+  # dir.create(label_name) 
   
 }
 
@@ -145,7 +146,7 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   #Figure out test, train, and validation indices
   #Stratify by yes/no and instrument - later stratify by source in next version
   idx_list <- pmap(crossing(unique(label_data$spacecraft),
-                            unique(label_data$is_kelp)) %>% as.list(),
+                            unique(label_data[[label_col]])) %>% as.list(),
                   ~ which(label_data$spacecraft==.x & label_data$is_kelp==.y))
   
   train_test_val <- map(idx_list, get_ttv_indicies, sample_per = sample_per)
@@ -160,7 +161,7 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
     
     data <- label_data[sample(which(label_data[,label_col] == category), num_images), ]
     
-    split_data_to_set_dirs(data=data, 
+    split_data_to_set_dirs(label_data=label_data, 
                            label_name=category, 
                            dataset_dir=dataset_dir, 
                            #testEnd=testEnd, trainEnd=testEnd, valStart=valStart, 
