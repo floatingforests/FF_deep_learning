@@ -105,7 +105,8 @@ remove_files_dirs <- function(directory) {
 # Split and Save PNGS to Separate Folders
 
 # Split and Save PNGS to Separate Folders
-split_data_to_set_dirs <- function(label_data, label_col = 'is_kelp', 
+split_data_to_set_dirs <- function(label_data, 
+                                   label_col = 'is_kelp', 
                                    dataset_dir, 
                                    train_idx, test_idx, val_idx) {
   
@@ -119,7 +120,7 @@ split_data_to_set_dirs <- function(label_data, label_col = 'is_kelp',
               validation = label_data[val_idx,])
   
   #walk over each dataset and get images from it
-  iwalk(dat, img_from_traintest, dataset_dir = dataset_dir))
+  iwalk(dat, img_from_traintest, dataset_dir = dataset_dir)
 # 
 #   setwd(file.path(dataset_dir,'train',label_name))
 #   map(train$locations, img_from_subject_ln)
@@ -171,9 +172,9 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   val_idx <- map(train_test_val, ~.x$val) %>% flatten_dbl()
   
   # Find, Save PNGS to Separate Directories
-  split_data_to_set_dirs(label_data=label_data, 
-                         label_name=category, 
-                         dataset_dir=dataset_dir, 
+  split_data_to_set_dirs(label_data = label_data, 
+                         label_col = label_col, 
+                         dataset_dir = dataset_dir, 
                          train_idx = train_idx, test_idx = test_idx, 
                          val_idx = val_idx)
   
