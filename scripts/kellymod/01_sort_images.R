@@ -1,4 +1,5 @@
 library(tidyverse)
+library(glue)
 
 
 # Set Working Directory for My Sanity
@@ -118,12 +119,13 @@ split_data_to_set_dirs <- function(data, label_name="kelp_yes",
 get_ttv_indicies <- function(vec,  sample_per = c(0.7,0.2,0.1)){
   if(sum(sample_per) != 1) stop("Sampling split between trian, test, and validation\n
                                 does not sum to 1")
-  
+  cat("splitting indices\n")
   train_samp <- sample(vec, size = round(sample_per[1]*length(vec)))
   
   test_samp <-  sample(vec[!(vec %in% train_samp)], size = round(sample_per[2]*length(vec)))
   
   val_samp <- vec[!(vec %in% c(train_samp, test_samp))]
+  cat("done\n\n")
   
   return(list(train = train_samp, test = test_samp, val = val_samp))
 }
@@ -154,8 +156,13 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   
   # Find, Save PNGS to Separate Directories
   for (category in categories) {
+    cat(glue("{category}\n\n"))
+    
     data <- label_data[sample(which(label_data[,label_col] == category), num_images), ]
-    split_data_to_set_dirs(data=data, label_name=category, dataset_dir=dataset_dir, 
+    
+    split_data_to_set_dirs(data=data, 
+                           label_name=category, 
+                           dataset_dir=dataset_dir, 
                            #testEnd=testEnd, trainEnd=testEnd, valStart=valStart, 
                            train_idx = train_idx, test_idx = test_idx, val_idx = val_idx,
                            num_images = num_images)
@@ -168,7 +175,7 @@ dir.create(dat_path)
 
 
 # Subset and Download Images
-set.seed(2020)
+set.seed(2021)
 make_dir_flow(label_data = falk_with_meta, label_col = 'is_kelp',
               categories=unique(falk_with_meta$is_kelp),
               #num_images = 100, #testing
