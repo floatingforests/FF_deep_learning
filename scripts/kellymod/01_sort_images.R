@@ -45,15 +45,30 @@ img_from_subject <- function(subj_url){
   
 }
 
-img_from_subject_ln <- function(subj_url){
+
+
+#Make a symbolic link from our bolus of imagery data to the correct
+#place in our ML dataset
+img_from_subject_ln <- function(subj_url, category, dataset_dir, train_test){
   
   filename <- basename(subj_url)
-  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{filename} ./{filename}"))
+  system(glue::glue("ln -s {working_dir}/data/images/falk_images/{filename} 
+                    {dataset_dir}/{train_test}/{category}/{filename}"))
   
   return(filename)
   
 }
 
+
+# Take a slice of the data labeled for training, testing, or validation,
+# and map over it to put images in the right place
+img_from_traintest <- function(train_test_dat, dat_type, dataset_dir){
+  map2(train_test_dat$locations, train_test_dat[[label_col]],
+       img_from_subject_ln, #the function!
+       dataset_dir = dataset_dir, train_test = dat_type
+  )
+  
+}
 
 # Make Train, Test, Validation Directories Function
 make_dirs <- function(dataset_dir){
@@ -88,31 +103,37 @@ remove_files_dirs <- function(directory) {
 }
 
 # Split and Save PNGS to Separate Folders
-split_data_to_set_dirs <- function(data, label_name="kelp_yes", 
+
+# Split and Save PNGS to Separate Folders
+split_data_to_set_dirs <- function(label_data, label_col = 'is_kelp', 
                                    dataset_dir, 
-                                   #trainEnd, testEnd, valStart, 
                                    train_idx, test_idx, val_idx,
                                    num_images) {
   
-  # train <- data[1:trainEnd,]
-  # test <- data[(trainEnd + 1):testEnd,]
-  # val <- data[valStart:num_images,]
-  # 
-  train <- data[train_idx,]
-  test <- data[test_idx,]
-  val <- data[val_idx,]
+  #make dirs we will use
+  categories <- unique(data[[label_col]])
+  walk(categories, ~ make_labels_subdir(dataset_dir, .x))
   
-  make_labels_subdir(dataset_dir, label_name)
+  #put data into a labeled list
+  dat <- list(train = label_data[train_idx,],
+              test = label_data[test_idx,],
+              validation = label_data[val_idx,])
   
-  setwd(file.path(dataset_dir,'train',label_name))
-  map(train$locations, img_from_subject_ln)
-  
-  setwd(file.path(dataset_dir,'test',label_name))
-  map(test$locations, img_from_subject_ln)
-  
-  setwd(file.path(dataset_dir,'validation',label_name))
-  map(val$locations, img_from_subject_ln)
+  #walk over each dataset and get images from it
+  iwalk(dat, img_from_traintest, dataset_dir = dataset_dir))
+# 
+#   setwd(file.path(dataset_dir,'train',label_name))
+#   map(train$locations, img_from_subject_ln)
+#   
+#   setwd(file.path(dataset_dir,'test',label_name))
+#   map(test$locations, img_from_subject_ln)
+#   
+#   setwd(file.path(dataset_dir,'validation',label_name))
+#   map(val$locations, img_from_subject_ln)
 }
+
+
+
 
 
 # Get indices for train, test, and validation data 
