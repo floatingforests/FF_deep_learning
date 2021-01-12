@@ -107,8 +107,7 @@ remove_files_dirs <- function(directory) {
 # Split and Save PNGS to Separate Folders
 split_data_to_set_dirs <- function(label_data, label_col = 'is_kelp', 
                                    dataset_dir, 
-                                   train_idx, test_idx, val_idx,
-                                   num_images) {
+                                   train_idx, test_idx, val_idx) {
   
   #make dirs we will use
   categories <- unique(data[[label_col]])
@@ -159,11 +158,6 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   # Make Directories
   make_dirs(dataset_dir)
   
-  # Figure Out Start Stop Indices
-  # testEnd <- floor(num_images*sample_per[1])
-  # trainEnd <- floor(num_images*sample_per[2])
-  # valStart <- num_images - trainEnd
-  
   #Figure out test, train, and validation indices
   #Stratify by yes/no and instrument - later stratify by source in next version
   idx_list <- pmap(crossing(unique(label_data$spacecraft),
@@ -177,18 +171,12 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   val_idx <- map(train_test_val, ~.x$val) %>% flatten_dbl()
   
   # Find, Save PNGS to Separate Directories
-  for (category in categories) {
-    cat(glue("{category}\n\n"))
-    
-    data <- label_data[sample(which(label_data[,label_col] == category), num_images), ]
-    
-    split_data_to_set_dirs(label_data=label_data, 
-                           label_name=category, 
-                           dataset_dir=dataset_dir, 
-                           #testEnd=testEnd, trainEnd=testEnd, valStart=valStart, 
-                           train_idx = train_idx, test_idx = test_idx, val_idx = val_idx,
-                           num_images = num_images)
-  }
+  split_data_to_set_dirs(label_data=label_data, 
+                         label_name=category, 
+                         dataset_dir=dataset_dir, 
+                         train_idx = train_idx, test_idx = test_idx, 
+                         val_idx = val_idx)
+  
   
 }
 
