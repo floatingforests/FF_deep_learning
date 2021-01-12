@@ -111,7 +111,7 @@ split_data_to_set_dirs <- function(label_data,
                                    train_idx, test_idx, val_idx) {
   
   #make dirs we will use
-  categories <- unique(data[[label_col]])
+  categories <- unique(label_data[[label_col]])
   walk(categories, ~ make_labels_subdir(dataset_dir, .x))
   
   #put data into a labeled list
