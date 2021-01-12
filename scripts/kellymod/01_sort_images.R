@@ -151,9 +151,9 @@ make_dir_flow <- function(label_data, label_col, num_images, dataset_dir, sample
   
   train_test_val <- map(idx_list, get_ttv_indicies, sample_per = sample_per)
   
-  train_idx <- map(train_test_val, ~.x$train) %>% flatten()
-  test_idx <- map(train_test_val, ~.x$test) %>% flatten()
-  val_idx <- map(train_test_val, ~.x$val) %>% flatten()
+  train_idx <- map(train_test_val, ~.x$train) %>% flatten_dbl()
+  test_idx <- map(train_test_val, ~.x$test) %>% flatten_dbl()
+  val_idx <- map(train_test_val, ~.x$val) %>% flatten_dbl()
   
   # Find, Save PNGS to Separate Directories
   for (category in categories) {
