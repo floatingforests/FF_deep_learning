@@ -1,3 +1,6 @@
+library(keras)
+library(tensorflow)
+
 # Set up Project Parent Data Directory
 # Set Working Directory for My Sanity
 working_dir = here::here()

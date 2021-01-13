@@ -1,6 +1,4 @@
 library(raster)
-library(keras)
-library(tensorflow)
 
 # Set Working Directory for My Sanity
 working_dir <- here::here()

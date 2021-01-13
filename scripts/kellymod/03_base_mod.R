@@ -1,4 +1,4 @@
-library(keras)
+
 source("00_constants.R")
 source("02_image_translate.R")
 
