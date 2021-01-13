@@ -27,6 +27,14 @@ train_generator = flow_images_from_directory(
   class_mode = "binary"
 )
 
+test_generator = flow_images_from_directory(
+  test_dir,
+  datagen,
+  target_size = c(500,500),
+  batch_size = 20,
+  class_mode = "binary"
+)
+
 valid_generator = flow_images_from_directory(
   val_dir,
   datagen,
