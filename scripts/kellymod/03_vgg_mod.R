@@ -4,8 +4,9 @@ source("00_constants.R")
 source("02_image_translate.R")
 
 model <- keras_model_sequential() %>%
-  layer_zero_padding_2d(input_shape = c(500, 500, 3)) %>%
+  layer_zero_padding_2d() %>%
   layer_conv_2d(filters = 64, kernel_size = c(3,3),
+                input_shape = c(500, 500, 3),
                 activation = "relu") %>%
   layer_zero_padding_2d() %>%
   layer_conv_2d(filters = 64, kernel_size = c(3,3),
