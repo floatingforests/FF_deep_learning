@@ -5,13 +5,13 @@ source("02_image_translate.R")
 
 model <- keras_model_sequential() %>%
   layer_conv_2d(filters = 32, kernel_size = c(5,5),
-                activation = "relu", input_shape = c(150, 150, 3)) %>%
+                activation = "relu", input_shape = c(500, 500, 3)) %>%
   layer_max_pooling_2d(pool_size = c(2,2)) %>%
   layer_conv_2d(filters = 64, kernel_size = c(5,5),
-                activation = "relu", input_shape = c(150, 150, 3)) %>%
+                activation = "relu", input_shape = c(500, 500, 3)) %>%
   layer_max_pooling_2d(pool_size = c(2,2)) %>%
   layer_conv_2d(filters = 64, kernel_size = c(5,5),
-                activation = "relu", input_shape = c(150, 150, 3)) %>%
+                activation = "relu", input_shape = c(500, 500, 3)) %>%
   layer_max_pooling_2d(pool_size = c(2,2)) %>%
   layer_flatten() %>%
   layer_dense(units = 16, activation = "relu") %>%
