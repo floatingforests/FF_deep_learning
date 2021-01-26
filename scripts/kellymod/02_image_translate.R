@@ -23,7 +23,8 @@ train_generator = flow_images_from_directory(
   datagen,
   target_size = c(500,500),
   batch_size = 20,
-  class_mode = "binary"
+  class_mode = "binary",
+  follow_links = TRUE
 )
 
 test_generator = flow_images_from_directory(
@@ -31,7 +32,8 @@ test_generator = flow_images_from_directory(
   datagen,
   target_size = c(500,500),
   batch_size = 20,
-  class_mode = "binary"
+  class_mode = "binary",
+  follow_links = TRUE
 )
 
 valid_generator = flow_images_from_directory(
@@ -39,5 +41,6 @@ valid_generator = flow_images_from_directory(
   datagen,
   target_size = c(500,500),
   batch_size = 20,
-  class_mode = "binary"
+  class_mode = "binary",
+  follow_links = TRUE
 )
