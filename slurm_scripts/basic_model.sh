@@ -23,11 +23,11 @@
 
 #set an account to use
 #if not used then default will be used
-##SBATCH --account=jarrett.byrnes
+##SBATCH --account=scavenger
 
 # set the number of GPU cards per node
 # --gres=gpu[[:type]:count]
-#SBATCH --gres=gpu:GTX670:4
+#SBATCH --gres=gpu:GTX980:4
 
 #Or can use this
 ##SBATCH --gres=gpu:2
