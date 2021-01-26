@@ -14,8 +14,9 @@ test_dir = file.path(dat_path, 'test')
 val_dir = file.path(dat_path, 'validation')
 
 # Set Up Image Generator
-datagen = image_data_generator(featurewise_center = TRUE,
-                               featurewise_std_normalization = TRUE)
+datagen = image_data_generator(rescale = 1/255)
+
+
 
 train_generator = flow_images_from_directory(
   train_dir,
